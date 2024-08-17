@@ -26,6 +26,7 @@ public class TcpClient {
         try {
             return new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -35,6 +36,16 @@ public class TcpClient {
             return new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void closeSocket() {
+        if (this.socket != null && !this.socket.isClosed()) {
+            try {
+                this.socket.close();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 }

@@ -2,12 +2,17 @@ package naveen.pubsub.handler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TcpServer {
 
+    private final int threadCount;
     private ServerSocket serverSocket;
 
     private TcpServer() {
+        this.threadCount = Runtime.getRuntime().availableProcessors();
     }
 
     public static TcpServer getInstance(int port) {
@@ -28,10 +33,27 @@ public class TcpServer {
     }
 
     public void start() {
-        try {
-            this.serverSocket.accept();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try (ExecutorService service = Executors.newFixedThreadPool(this.threadCount)) {
+            while (true) {
+                Socket clientSocket = null;
+                try {
+                    clientSocket = this.serverSocket.accept();
+                    service.submit(ClientHandler.getInstance(clientSocket));
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    public void closeClientSocket(Socket clientSocket) {
+        if (clientSocket != null && !clientSocket.isClosed()) {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
