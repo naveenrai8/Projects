@@ -24,19 +24,21 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        System.out.println(this.clientSocket.getInetAddress());
         while (true) {
             try {
                 String message = reader.readLine();
                 if (message.equals("bye")) {
                     break;
                 }
-                System.out.println(message);
+                //System.out.println(message);
                 this.writer.println("From Server: " + message);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
         }
+        closeSocket();
     }
 
     private void closeSocket() {

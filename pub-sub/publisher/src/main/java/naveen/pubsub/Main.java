@@ -7,12 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Main implements Runnable {
     public static void main(String[] args) {
-        try (ExecutorService service = Executors.newFixedThreadPool(10)) {
-            for (int i = 0; i < 10; i++) {
+        try (ExecutorService service = Executors.newFixedThreadPool(1000)) {
+            for (int i = 0; i < 1000; i++) {
                 service.submit(new Main());
             }
         }
@@ -24,16 +23,12 @@ public class Main implements Runnable {
         PrintWriter outputStream = tcpClient.getOutputStream();
         BufferedReader inputStream = tcpClient.getInputStream();
         int i = 0;
-        while (i++ < 10) {
+        while (i++ < 10000) {
             try {
-                TimeUnit.MILLISECONDS.sleep((int) (Math.random() * 2000));
-
                 outputStream.println("Hello from client " + i + " -> " + Thread.currentThread().threadId());
                 System.out.println(inputStream.readLine());
             } catch (IOException e) {
                 System.out.println(e.getMessage());
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
