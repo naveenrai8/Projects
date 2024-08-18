@@ -19,6 +19,7 @@ public class TcpServer {
         TcpServer tcpServer = new TcpServer();
         try {
             tcpServer.serverSocket = new ServerSocket(port);
+            tcpServer.serverSocket.setReuseAddress(true);
         } catch (IOException e) {
             if (!tcpServer.serverSocket.isClosed()) {
                 try {
