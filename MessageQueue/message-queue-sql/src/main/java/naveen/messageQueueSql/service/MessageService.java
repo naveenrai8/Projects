@@ -1,8 +1,11 @@
 package naveen.messageQueueSql.service;
 
+import naveen.messageQueueSql.entity.Message;
 import naveen.messageQueueSql.repository.MessageRepository;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,11 +17,11 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    public boolean getMessages(int count){
-        return getMessages(count, UUID.randomUUID().toString());
-    }
+    public List<Message> getMessages(int count, String clientId) {
+        if (Strings.isBlank(clientId)) {
+            clientId = UUID.randomUUID().toString();
+        }
 
-    public boolean getMessages(int count, String clientId){
-        return false;
+        return this.messageRepository.getMessages(count);
     }
 }
