@@ -17,11 +17,11 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    public List<Message> getMessages(int count, String clientId) {
-        if (Strings.isBlank(clientId)) {
-            clientId = UUID.randomUUID().toString();
+    public List<Message> getMessages(int count, String consumerId) {
+        if (Strings.isBlank(consumerId)) {
+            consumerId = UUID.randomUUID().toString();
         }
 
-        return this.messageRepository.getMessages(count);
+        return this.messageRepository.getMessages(count, consumerId);
     }
 }

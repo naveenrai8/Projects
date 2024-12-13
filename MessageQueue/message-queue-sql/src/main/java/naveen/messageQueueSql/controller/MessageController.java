@@ -23,7 +23,7 @@ public class MessageController {
 
     @GetMapping()
     public List<Message> getMessage(@RequestParam("count") int count,
-                                    @RequestParam(required = false, name = "client_id") String clientId) {
-        return this.messageService.getMessages(count, clientId);
+                                    @RequestParam(required = false, name = "consumer_id") String consumerId) {
+        return this.messageService.getMessages(count, consumerId);
     }
 }

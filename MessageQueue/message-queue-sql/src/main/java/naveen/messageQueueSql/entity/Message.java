@@ -10,5 +10,5 @@ import lombok.*;
 public class Message {
     private long id;
     private String content;
-    private String  clientId;
+    private String  consumerId;
 }

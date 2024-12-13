@@ -2,9 +2,9 @@ create table message
 (
     id bigint not null,
     content varchar(1024) not null,
-    client_id varchar(255)
+    consumer_id varchar(255)
 );
 
-insert into message (id, content, client_id)
+insert into message (id, content, consumer_id)
 values (1, 'test message', '1'),
 (2, 'test message 2', null);

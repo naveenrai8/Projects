@@ -16,7 +16,7 @@ public class MessageRepository {
     private JdbcTemplate jdbcTemplate;
 
     private static final String INSERT_QUERY = """
-             insert into message (id, content, client_id)
+             insert into message (id, content, consumer_id)
              values (?,?,?)
             """;
 
@@ -30,11 +30,19 @@ public class MessageRepository {
 
     private static final String GET_QUERY_COUNT_FROM_LAST =
             """
-                    SELECT * FROM MESSAGE order by id desc limit ?
-                    """;
+                    SELECT * FROM MESSAGE
+                    where consumer_id is null
+                    order by id desc limit ?
+            """;
+
+    private static final String UPDATE_CONSUMER_ID_QUERY =
+            """
+                update message set consumer_id = ?
+                        where id = ?
+            """;
 
     public void insert(Message message) {
-        this.jdbcTemplate.update(INSERT_QUERY, message.getId(), message.getContent(), message.getClientId());
+        this.jdbcTemplate.update(INSERT_QUERY, message.getId(), message.getContent(), message.getConsumerId());
     }
 
     public void delete(long id) {
@@ -47,9 +55,15 @@ public class MessageRepository {
                 id);
     }
 
-    public List<Message> getMessages(int count) {
-        return this.jdbcTemplate.query(GET_QUERY_COUNT_FROM_LAST,
+    @Transactional
+    public List<Message> getMessages(int count, String consumerId) {
+        List<Message> messages = this.jdbcTemplate.query(GET_QUERY_COUNT_FROM_LAST,
                 new BeanPropertyRowMapper<>(Message.class),
                 count);
+        for (Message message : messages) {
+            message.setConsumerId(consumerId);
+            this.jdbcTemplate.update(UPDATE_CONSUMER_ID_QUERY, consumerId,  message.getId());
+        }
+        return messages;
     }
 }
