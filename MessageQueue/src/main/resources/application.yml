@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: MessageQueue
+  datasource:
+    url: jdbc:mysql://localhost:3306/db?
+    username: root
+    password: naveen
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  port: 8001
