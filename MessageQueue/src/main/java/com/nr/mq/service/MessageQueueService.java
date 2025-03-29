@@ -19,8 +19,8 @@ public class MessageQueueService {
     private final MessageQueueRepository repository;
     private final MessageQueueMapper mapper;
 
-    public List<MessagesResponseDto> getMessagesByCount(int count, String clientId) {
-        var messages = repository.getMessages(clientId, count);
+    public List<MessagesResponseDto> getMessagesByCount(int count, String clientId, int leaseTimeInSeconds) {
+        var messages = repository.getMessages(clientId, count, leaseTimeInSeconds);
         return messages.stream().map(
                 m ->
                         new MessagesResponseDto(m.getId(), m.getContent())

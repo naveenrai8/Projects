@@ -1,10 +1,11 @@
 create database if not exists db;
 
-create table if not exists messageQueue1
+create table if not exists messageQueue
 (
 	id varchar(255) not null,
     content varchar(255),
     clientId varchar(255),
+    leaseTill long,
     primary key (id)
 )
 

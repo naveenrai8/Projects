@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -13,4 +15,5 @@ public class Message {
     private String id;
     private String clientId;
     private String content;
+    private LocalDateTime leaseTill;
 }

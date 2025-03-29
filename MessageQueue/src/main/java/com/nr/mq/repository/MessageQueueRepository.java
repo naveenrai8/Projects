@@ -11,6 +11,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +24,7 @@ import java.util.List;
 public class MessageQueueRepository {
 
     private final JdbcTemplate jdbcTemplate;
-
+    private static final ZoneOffset ZONE_OFFSET_NOW = ZoneOffset.UTC;
     private static final String SET_MESSAGES =
             """
                             insert into messageQueue(id, content) values
@@ -31,7 +35,7 @@ public class MessageQueueRepository {
     private static final String UPDATE_CLIENT_MESSAGES =
             """
                            update messageQueue
-                           set clientId = ? where id = ?;
+                           set clientId = ?, leaseTill = ? where id = ?;
                     """;
 
     private static final String DELETE_MESSAGES =
@@ -43,7 +47,7 @@ public class MessageQueueRepository {
     private static final String GET_MESSAGES =
             """
                             select id, content, clientId from messageQueue
-                            where clientId is null
+                            where clientId is null or leaseTill < (?)
                             limit ? for update skip locked
                     """;
 
@@ -57,15 +61,18 @@ public class MessageQueueRepository {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public List<Message> getMessages(String clientId, int count) {
+    public List<Message> getMessages(String clientId, int count, int leaseTimeInSeconds) {
         List<Message> messages = new ArrayList<>();
 
         var rows = jdbcTemplate.query(GET_MESSAGES,
-                new BeanPropertyRowMapper<>(Message.class), count);
+                new BeanPropertyRowMapper<>(Message.class), LocalDateTime.now().toEpochSecond(ZONE_OFFSET_NOW),  count);
+        log.info("Time: {}",  LocalDateTime.now().plusSeconds(leaseTimeInSeconds).toEpochSecond(ZONE_OFFSET_NOW));
         rows.forEach(
                 row -> {
                     messages.add(row);
-                    jdbcTemplate.update(UPDATE_CLIENT_MESSAGES, clientId, row.getId());
+                    jdbcTemplate.update(UPDATE_CLIENT_MESSAGES, clientId,
+                            LocalDateTime.now().plusSeconds(leaseTimeInSeconds).toEpochSecond(ZONE_OFFSET_NOW),
+                            row.getId());
                 }
         );
         return messages;

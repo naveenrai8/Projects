@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -23,11 +24,12 @@ public class MessageQueueController {
     @GetMapping()
     public ResponseEntity<List<MessagesResponseDto>> getMessages(
             @RequestHeader(CLIENT_ID_HEADER) String clientId,
-            @RequestParam int count) {
+            @RequestParam int count,
+            @RequestParam(value = "leaseTimeInSeconds") Optional<Integer> leaseTimeInSeconds) {
         if (count <= 0) {
             throw new IllegalArgumentException("count must be greater than 0");
         }
-        var messages = service.getMessagesByCount(count, clientId);
+        var messages = service.getMessagesByCount(count, clientId, leaseTimeInSeconds.orElseGet(() -> leaseTimeInSeconds.orElse(10)));
         return ResponseEntity.ok(messages);
     }
 
