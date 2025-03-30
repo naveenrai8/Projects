@@ -1,5 +1,6 @@
 package naveen.pubsub;
 
+import lombok.extern.slf4j.Slf4j;
 import naveen.pubsub.handler.TcpClient;
 
 import java.io.BufferedReader;
@@ -8,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class Main implements Runnable {
     public static void main(String[] args) {
         try (ExecutorService service = Executors.newFixedThreadPool(1000)) {
@@ -26,7 +28,7 @@ public class Main implements Runnable {
         while (i++ < 10000) {
             try {
                 outputStream.println("Hello from client " + i + " -> " + Thread.currentThread().threadId());
-                System.out.println(inputStream.readLine());
+                log.info(inputStream.readLine());
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
